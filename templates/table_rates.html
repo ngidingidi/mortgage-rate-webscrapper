@@ -1,0 +1,43 @@
+{% extends 'base.html' %} {% block content %}
+
+<div class="container">
+  <div class="row justify-content-center">
+    <div class="col-10">
+      <h1 class="text-center">MORTGAGE RATES</h1>
+      <table id="myTable" class="table table-bordered">
+        <thead>
+            <tr class="thead-dark">
+                {% for col in table.columns %}
+                    <th>{{ col }}</th>
+                {% endfor %}
+            </tr>
+        </thead>
+        <tbody>
+        {% for row in table.iterrows() %}
+            <tr class="align-content-center">
+                {% for col, value in row[1].items() %}
+                            <td class="pt-3">{{ value }}</a></td>
+                {% endfor %}
+            </tr>
+        {% endfor %}
+    
+        </tbody>
+    </table>
+
+    <script>
+      $(document).ready(function () {
+        $("#myTable").DataTable({
+          aaSorting: [[0, "desc"]],
+        });
+      });
+    </script>
+  </div>
+</div>
+
+<style>
+  .right-placement {
+    max-width: 80% !important;
+  }
+</style>
+
+{% endblock %}
