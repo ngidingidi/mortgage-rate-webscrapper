@@ -6,4 +6,5 @@ I decided to use python to accomplish this task since I have some backnground on
 
 In this demonstration, I use python to extract mortgage interest rates from a webpage (webscraping), then store the results in an sqlite database, and visualize trends on a webpage using python Flask. I used the plotly python library for visualization since it provides interactive plots which make for an improved user experience.
 
-I scrape the mortgage rates from this website: <a href="https://www.nerdwallet.com/mortgages/mortgage-rates" target="_blank">
+I scrape the mortgage rates from this website:
+https://www.nerdwallet.com/mortgages/mortgage-rates
