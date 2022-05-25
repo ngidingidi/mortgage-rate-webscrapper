@@ -8,3 +8,7 @@ In this demonstration, I use python to extract mortgage interest rates from a we
 
 I scrape the mortgage rates from this website:
 https://www.nerdwallet.com/mortgages/mortgage-rates
+
+This is what the visualization looks like:
+
+![My Image](static/img/picture_trend.PNG)
