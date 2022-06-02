@@ -1,6 +1,6 @@
 # python-webscraping-sqlite-database-flask-mortgage-rates
 
-Mortgage rates have been increasing at an alarming pace since the beginning of 2022. I have been following them closely and watching the trends pretty much on a daily basis. I wanted to build a script which could fetch the rates from the internet and visualize them on a webpage. 
+Mortgage rates have been increasing at an alarming pace since the beginning of 2022. I have been following them quite closely and watching the trends pretty much on a daily basis. I wanted to build a program/script which fetches mortage interest rates from the internet and visualize them on a webpage. 
 
 I decided to use python to accomplish this task since I have some backnground on the language.
 
@@ -11,4 +11,4 @@ https://www.nerdwallet.com/mortgages/mortgage-rates
 
 This is what the visualization looks like:
 
-![My Image](static/img/picture_trend.PNG)
+![My Image](static/img/picture_rate_trend.PNG)
