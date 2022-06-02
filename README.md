@@ -11,4 +11,4 @@ https://www.nerdwallet.com/mortgages/mortgage-rates
 
 This is what the visualization looks like:
 
-![My Image](static/img/picture_trend.PNG)
+![My Image](static/img/picture_rate_trend.PNG)
