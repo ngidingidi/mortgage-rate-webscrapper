@@ -125,7 +125,8 @@ def index():
     
     fig = px.scatter(df, 
                      x=df['date'], 
-                     y=df['mortgage_rate'])
+                     y=df['mortgage_rate'],
+                     width=1000, height=580)
     print(df.shape)
     fig.update_xaxes(categoryorder='category ascending')
     fig.update_traces(mode='lines+markers', 
