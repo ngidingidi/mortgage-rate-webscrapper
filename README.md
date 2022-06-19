@@ -15,3 +15,4 @@ https://fred.stlouisfed.org/series/SP500
 This is what the visualization looks like:
 
 ![My Image](static/img/picture_rate_trend.PNG)
+![My Image](static/img/picture_snp_trend.PNG)
