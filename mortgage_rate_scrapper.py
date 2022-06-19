@@ -6,7 +6,7 @@ Created on Fri May 20 18:15:16 2022
 """
 
 import pandas as pd
-import requests
+import requests,time
 from bs4 import BeautifulSoup
 from datetime import datetime
 from flask import Flask, render_template, send_from_directory
@@ -78,7 +78,7 @@ print(df.dtypes)
 
 for index, row in df.iterrows():
   if (row["date"] == page_listed_date):
-      print('The dataframe already contains the page listed date.')
+      print('The mortgage dataframe already contains the page listed date.')
       df.drop([index],axis='index', inplace=True)
       df_updated = pd.concat([df,table_rates])
       try:
@@ -87,7 +87,7 @@ for index, row in df.iterrows():
           pass
       
   else:
-      print('The dataframe does not contain the page listed date. We will add this date.')
+      print('The mortgage dataframe does not contain the page listed date. We will add this date.')
       df_updated = pd.concat([df,table_rates])
       try:
           df_updated.drop('Unnamed: 0', axis=1, inplace=True)
@@ -108,6 +108,61 @@ for row in cur.execute('SELECT * FROM mortgage_rates'):
 # Close connection to SQLite database
 conn.close()
 
+# Now move on and webscrape S & P index website. We do it slightly differently
+
+print('-----------------')
+
+response_snp = requests.get('https://fred.stlouisfed.org/series/SP500')
+if (response_snp.status_code) == 200:
+    print('----Successfully received HTTP response----------')
+else:
+    print('----Did not successfully receive HTTP response------')
+    
+soup_snp = BeautifulSoup(response_snp.text, 'html.parser')
+# print(soup_snp)
+# Find the text in the span tag whose class is the one specified below
+
+snp_page_listed_date_string = soup_snp.select_one("span[class='series-meta-value']").text[:-1]
+
+snp_page_listed_date = datetime.strptime(snp_page_listed_date_string, "%Y-%m-%d")
+print(snp_page_listed_date)
+
+page_listed_index = soup_snp.select_one("span[class='series-meta-observation-value']").text
+print(page_listed_index)
+
+# Create a DataFrame
+
+snp_data = {
+  "date": [snp_page_listed_date],
+  "snp_index": [page_listed_index]
+}
+
+# Save the data csv the first time you run and comment out
+table_snp_index = pd.DataFrame(snp_data)
+# print(table_snp_index.dtypes)
+#table_snp_index.to_csv('snp_index_at_close.csv', index=False)
+
+
+df_snp = pd.read_csv('snp_index_at_close.csv', parse_dates=["date"])
+df_snp = df_snp.drop_duplicates(keep='first')  
+
+
+for index1, row1 in df_snp.iterrows():
+    print(row1['date'])
+    if (row1["date"] != snp_page_listed_date):
+        print('The snp dataframe does not contain the page listed date.')
+        #df_snp.drop([index],axis='index', inplace=True)
+        df_updated_snp = pd.concat([df_snp,table_snp_index])
+        df_updated = df_updated.drop_duplicates(keep='first')   
+      
+# Drop duplicate rows and Save the updated dataframe
+
+df_updated_snp.to_csv('snp_index_at_close.csv', index=False)
+
+#df_updated_snp.to_sql('snp_index', conn, if_exists='replace', index=False) 
+
+
+
 # Begin flask app
 
 app = Flask(__name__, static_folder='static')
@@ -115,11 +170,11 @@ app = Flask(__name__, static_folder='static')
 @app.route('/', methods = ['GET'])
 def index():
     """
-    Returns graph showing mortgage rates trend
+    Returns graph showing mortgage rates trend and S & P Index trend
     """
     #df = pd.read_csv('mortgage_rates.csv', parse_dates=["date"])
     
-    df = df_updated
+    df = pd.read_csv('mortgage_rates.csv')
     df['mortgage_rate'] = pd.to_numeric(df['mortgage_rate'],errors = 'coerce')
     df.sort_values(by='date', ascending=True, inplace=True)
     
@@ -134,14 +189,31 @@ def index():
 
     graphJSON = json.dumps(fig, cls=plotly.utils.PlotlyJSONEncoder)
     
-    return render_template('index.html', graphJSON=graphJSON)
+    df_snp = pd.read_csv('snp_index_at_close.csv', parse_dates=["date"])
+    df_snp['snp_index'] = df_snp['snp_index'].str.replace(',', '').astype(float)
+    #print(df_snp.dtypes)
+    
+    df_snp.sort_values(by='date', ascending=True, inplace=True)
+    fig_snp = px.scatter(df_snp, 
+                     x=df_snp['date'], 
+                     y=df_snp['snp_index'],
+                     width=1000, height=580)
+    fig_snp.update_xaxes(categoryorder='category ascending')
+    fig_snp.update_traces(mode='lines+markers', 
+                      marker_line_width=2, marker_size=10)
+    
+    snpGraphJSON = json.dumps(fig_snp, cls=plotly.utils.PlotlyJSONEncoder)
+
+    
+    return render_template('index.html', graphJSON=graphJSON,
+                           snpGraphJSON=snpGraphJSON)
 
 @app.route('/table', methods = ['GET'])
 def table():
     """
     Returns table showing mortgage rates over time
     """
-    df = df_updated
+    df = pd.read_csv('mortgage_rates.csv')
     df['mortgage_rate'] = pd.to_numeric(df['mortgage_rate'],errors = 'coerce')
     df['mortgage_rate'] = df['mortgage_rate'].round(3)
     df.sort_values(by='date', ascending=True, inplace=True)

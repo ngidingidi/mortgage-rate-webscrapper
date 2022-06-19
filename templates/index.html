@@ -4,7 +4,13 @@
   <h3 class="text-center"> Mortgage Rate Trend </h3>
 </div>
 
-<div id="chart" class="container"></div>
+<div id="mortgage-chart" class="container"></div>
+
+<div class="container">
+  <h3 class="text-center"> S & P Index Trend </h3>
+</div>
+
+<div id="snp-chart" class="container"></div>
 
 <style>
   
@@ -12,9 +18,13 @@
 
 <script>
      
-    var graphs = {{graphJSON | safe}};
+    var mortgageGraph = {{graphJSON | safe}};
     
-    Plotly.plot('chart',graphs,{}); 
+    Plotly.plot('mortgage-chart',mortgageGraph,{}); 
+
+    var snpGraph = {{snpGraphJSON | safe}};
+    
+    Plotly.plot('snp-chart',snpGraph,{}); 
 
 </script>
 
